@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask IoT Notice Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+       
+       
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+    
+
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>IoT Notice Board</h1>
+    <ul id="message-list"></ul>
+    <form id="message-form">
+        <label for="message-input" >New Message:</label>
+        <input type="text" id="message-input"  oninput="checkInput()" name="message" placeholder="Enter a new message">
+         
+
+        <label for="num-messages">Number of Messages:</label>
+        <select id="num-messages" name="num-messages">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+        </select>
+        <p>"Press ENTER key to update "</p>
+
+    </form>
+
+    <script>
+        var messages;
+        var codes = [];
+        var myButton = document.getElementById("myButton");
+
+        function newadd() {
+            var newMessage = document.getElementById("message-input").value;
+            codes.push(newMessage);
+            console.log(codes)
+            console.log("in new add")
+            var messageList = document.getElementById('message-list');
+            messageList.innerHTML = "";
+            codes.forEach(function (message) {
+                var listItem = document.createElement('li');
+                listItem.textContent = message;
+                messageList.appendChild(listItem);
+                console.log(message + " update message fun")
+                document.getElementById("message-input").value = "";
+            }
+            );
+        }
+        function checkInput() {
+      // Get the input value
+      var usernameInput = document.getElementById('message-input').value;
+      var nummes = document.getElementById('num-messages').value;
+      // Get the submit button
+      var addButton = document.getElementById('addButton');
+      
+      var updateButton = document.getElementById('updateButton');
+
+      // Disable the button if the input is empty, enable it otherwise
+      addButton.disabled = usernameInput.trim() === ''&&nummes<=codes.length();
+      updateButton.disabled = usernameInput.trim() === ''&&nummes<=codes.length();
+      
+    }
+        function newupdate() {
+
+            console.log("in new upadte")
+            var form = document.getElementById('message-form');
+
+            // Create FormData object
+            var formData = new FormData(form);
+            var data = {};
+            // Iterate through form data
+            formData.forEach(function (value, key) {
+                data[key] = value;
+            });
+            console.log(formData)
+            newadd();
+            fetch("/update-messages", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
+
+        function newclearlast(){
+            codes.pop();
+            var messageList = document.getElementById('message-list');
+            messageList.innerHTML = "";
+            codes.forEach(function (message) {
+                var listItem = document.createElement('li');
+                listItem.textContent = message;
+                messageList.appendChild(listItem);
+                console.log(message + " update message fun")
+                document.getElementById("message-input").value = "";
+            }
+            );
+        }
+        function newclearall(){
+            codes=[];
+            var messageList = document.getElementById('message-list');
+            messageList.innerHTML = "";
+            codes.forEach(function (message) {
+                var listItem = document.createElement('li');
+                listItem.textContent = message;
+                messageList.appendChild(listItem);
+                console.log(message + " update message fun")
+                document.getElementById("message-input").value = "";
+            }
+            );
+        }
+
+        function updateNoticeBoard() {
+            var messageList = document.getElementById('message-list');
+            messageList.innerHTML = "";
+            messages.forEach(function (message) {
+                var listItem = document.createElement('li');
+                listItem.textContent = message;
+                messageList.appendChild(listItem);
+                console.log(message + " update message fun")
+                document.getElementById("message-input").value = "";
+            }
+            );
+        }
+
+        function addMessage() {
+            
+            var formData = document.getElementById('message-list');
+
+            messages = formData
+            console.log(messages)
+            console.log(formData)
+            console.log("here in add getelid")
+            var messageList = document.getElementById('message-list');
+            messageList.innerHTML = "";
+            messages.forEach(function (message) {
+                var listItem = document.createElement('li');
+                listItem.textContent = message;
+                messageList.appendChild(listItem);
+                console.log(message + " add message fun")
+                document.getElementById("message-input").value = "";
+            }
+            );
+        }
+        function clearLastMessage() {
+            if (messages.length > 0) {
+                messages.pop();
+                updateNoticeBoard();
+            }
+        }
+
+        function clearAllMessages() {
+            messages = [];
+            updateNoticeBoard();
+        }
+        document.getElementById("message-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(event.target);
+            var data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch("/update-messages", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messages = data.messages;
+                        console.log("ythim here")
+                        updateNoticeBoard();
+                    } else {
+                        console.error("Failed to update messages.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        // updateNoticeBoard();
+    </script>
+</body>
+
+</html>
